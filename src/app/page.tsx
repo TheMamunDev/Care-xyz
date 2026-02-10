@@ -1,5 +1,6 @@
 import AboutSection from '@/components/home/AboutSection/AboutSection';
 import HeroSection from '@/components/home/HeroSlider/HeroSlider';
+import ServiceOverview from '@/components/home/ServicesOverview/ServicesOverview';
 import Image from 'next/image';
 
 export default function Home() {
@@ -11,6 +12,7 @@ export default function Home() {
         {/* <p className="text-gray-600 mt-4">More sections coming next...</p> */}
       </div>
       <AboutSection></AboutSection>
+      <ServiceOverview></ServiceOverview>
     </div>
   );
 }
