@@ -1,6 +1,7 @@
 import AboutSection from '@/components/home/AboutSection/AboutSection';
 import HeroSection from '@/components/home/HeroSlider/HeroSlider';
 import ServiceOverview from '@/components/home/ServicesOverview/ServicesOverview';
+import TestimonialsSection from '@/components/home/TestimonialsSection/TestimonialsSection';
 import Image from 'next/image';
 
 export default function Home() {
@@ -13,6 +14,7 @@ export default function Home() {
       </div>
       <AboutSection></AboutSection>
       <ServiceOverview></ServiceOverview>
+      <TestimonialsSection></TestimonialsSection>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import './globals.css';
 import TanstackProvider from '@/components/providers/TanstackProvider';
 import Navbar from '@/components/shared/NavBar/NavBar';
 import Footer from '@/components/shared/Footer/Footer';
+import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,6 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <TanstackProvider>
+          <Toaster />
           <div className="flex min-h-screen flex-col">
             <Navbar />
             <main className="flex-1">{children}</main>
