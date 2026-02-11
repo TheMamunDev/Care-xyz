@@ -9,6 +9,8 @@ import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { signIn } from 'next-auth/react';
+
 import {
   Form,
   FormControl,
@@ -25,6 +27,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { toast } from 'sonner';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -42,11 +45,20 @@ export default function LoginPage() {
 
   async function onSubmit(data: z.infer<typeof loginSchema>) {
     setIsLoading(true);
-    setTimeout(() => {
-      console.log('Login Data:', data);
+
+    const res = await signIn('credentials', {
+      email: data.email,
+      password: data.password,
+      redirect: false,
+    });
+
+    if (res?.error) {
+      toast('Invalid credentials.');
       setIsLoading(false);
+    } else {
       router.push('/my-bookings');
-    }, 1500);
+      router.refresh();
+    }
   }
 
   return (

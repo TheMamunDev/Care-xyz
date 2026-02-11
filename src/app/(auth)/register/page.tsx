@@ -67,16 +67,26 @@ export default function RegisterPage() {
 
   async function onSubmit(data: RegisterFormValues) {
     setIsLoading(true);
-    setTimeout(() => {
-      console.log('Registration Data:', data);
-      setIsLoading(false);
 
-      toast('Account Created Successfully!', {
-        description: 'Monday, January 3rd at 6:00pm',
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
       });
 
-      router.push('/services');
-    }, 2000);
+      if (res.ok) {
+        toast('Account created successfully.');
+        router.push('/login');
+      } else {
+        const errorData = await res.json();
+        toast('Registration failed.');
+      }
+    } catch (error) {
+      toast('Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
