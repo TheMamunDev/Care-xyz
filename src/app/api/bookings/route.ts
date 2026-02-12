@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { serviceId, serviceName, date, duration, location } = body;
+    const { serviceId, serviceName, date, duration, location, email } = body;
 
     await connectDB();
 
@@ -36,6 +36,7 @@ export async function POST(req: Request) {
       duration,
       totalCost,
       location,
+      email,
       status: 'Pending',
     });
 

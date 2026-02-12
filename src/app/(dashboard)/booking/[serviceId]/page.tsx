@@ -109,19 +109,13 @@ export default function BookingPage() {
         },
       };
 
-      console.log(payload);
-      return;
-
       const res = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
       if (!res.ok) throw new Error('Failed to book');
-
       toast('Your booking has been confirmed.');
-
       router.push('/my-bookings');
     } catch (error) {
       toast('Something went wrong. Please try again.');
