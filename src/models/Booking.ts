@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, models } from 'mongoose';
+import { Schema, model, models } from 'mongoose';
 
 const BookingSchema = new Schema(
   {
@@ -16,7 +16,7 @@ const BookingSchema = new Schema(
     location: {
       division: { type: String, required: true },
       district: { type: String, required: true },
-      address: { type: String, required: true }, 
+      address: { type: String, required: true },
     },
   },
   { timestamps: true },
