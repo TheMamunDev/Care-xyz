@@ -14,17 +14,12 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useState } from 'react';
-
-const MOCK_USER = {
-  name: 'Rahim Ahmed',
-  email: 'rahim@example.com',
-  image: 'https://github.com/shadcn.png',
-  role: 'user', // or 'admin'
-};
+import { signOut, useSession } from 'next-auth/react';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const user = MOCK_USER;
+  const { data: session } = useSession();
+  const user = session?.user;
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -34,7 +29,7 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background">
-      <div className="container max-w-7xl mx-auto flex h-16 items-center justify-between px-4 md:px-8">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         <Link href="/" className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg">
             C
@@ -65,8 +60,11 @@ export default function Navbar() {
                   className="relative h-8 w-8 rounded-full"
                 >
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.image} alt={user.name} />
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage
+                      src={user?.image || ''}
+                      alt={user?.name || ''}
+                    />
+                    <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -74,10 +72,10 @@ export default function Navbar() {
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">
-                      {user.name}
+                      {user?.name}
                     </p>
                     <p className="text-xs leading-none text-muted-foreground">
-                      {user.email}
+                      {user?.email}
                     </p>
                   </div>
                 </DropdownMenuLabel>
@@ -95,7 +93,10 @@ export default function Navbar() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive focus:text-destructive cursor-pointer">
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive cursor-pointer"
+                  onClick={() => signOut()}
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>
@@ -154,7 +155,10 @@ export default function Navbar() {
                     >
                       My Bookings
                     </Link>
-                    <button className="text-left text-lg font-semibold text-destructive">
+                    <button
+                      className="text-left text-lg font-semibold text-destructive"
+                      onClick={() => signOut()}
+                    >
                       Log Out
                     </button>
                   </>

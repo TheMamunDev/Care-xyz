@@ -124,7 +124,7 @@ export default function LoginPage() {
               variant="outline"
               type="button"
               className="w-full"
-              onClick={() => alert('Google Login Logic')}
+              onClick={() => signIn('google', { callbackUrl: '/my-bookings' })}
             >
               Google
             </Button>

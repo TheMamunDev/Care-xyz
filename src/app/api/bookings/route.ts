@@ -4,6 +4,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import connectDB from '@/lib/db';
 import Booking from '@/models/Booking';
 import Services from '@/models/Service';
+import { sendInvoiceEmail } from '@/lib/email';
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
@@ -14,7 +15,17 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { serviceId, serviceName, date, duration, location, email } = body;
+    const {
+      serviceId,
+      serviceName,
+      date,
+      duration,
+      location,
+      email,
+      paymentPreference,
+      paymentStatus,
+      transactionId,
+    } = body;
 
     await connectDB();
 
@@ -37,7 +48,20 @@ export async function POST(req: Request) {
       totalCost,
       location,
       email,
+      paymentPreference,
+      paymentStatus,
+      transactionId,
       status: 'Pending',
+    });
+    await sendInvoiceEmail({
+      orderId: newBooking._id.toString(),
+      customerName: session.user.name || 'Valued Customer',
+      customerEmail: session.user.email || '',
+      serviceName: serviceName,
+      date: date,
+      duration: duration,
+      totalCost: totalCost,
+      address: `${location.address}, ${location.district}`,
     });
 
     return NextResponse.json(

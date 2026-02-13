@@ -180,6 +180,17 @@ export default function BookingList({
                 View Details
               </Button>
 
+              {booking.status !== 'Cancelled' && (
+                <Button
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={() => router.push(`/payment/${booking._id}`)}
+                >
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  Pay Now
+                </Button>
+              )}
+
               {booking.status === 'Pending' && (
                 <Button
                   variant="destructive"

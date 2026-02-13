@@ -22,17 +22,18 @@ export const authOptions: AuthOptions = {
           await connectDB();
           const user = await User.findOne({ email });
           if (!user) {
-            return null; 
+            return null;
           }
           const passwordsMatch = await bcrypt.compare(password, user.password);
           if (!passwordsMatch) {
-            return null; 
+            return null;
           }
           return {
             id: user._id.toString(),
             name: user.fullName,
             email: user.email,
             role: user.role,
+            authType: 'credentials',
           };
         } catch (error) {
           console.log('Error: ', error);
@@ -50,10 +51,29 @@ export const authOptions: AuthOptions = {
   },
   callbacks: {
     // Add user role to the token and session
-    async jwt({ token, user }: any) {
+    async jwt({ token, user, account }: any) {
       if (user) {
-        token.role = user.role;
-        token.id = user.id;
+        if (account?.provider === 'google') {
+          try {
+            await connectDB();
+            let dbUser = await User.findOne({ email: user.email });
+            if (!dbUser) {
+              dbUser = await User.create({
+                fullName: user.name,
+                email: user.email,
+                image: user.image || user.picture || null,
+                authType: 'google',
+              });
+            }
+            token.role = dbUser.role;
+            token.id = dbUser._id.toString();
+          } catch (error) {
+            console.log(error);
+          }
+        } else {
+          token.role = user.role;
+          token.id = user.id;
+        }
       }
       return token;
     },

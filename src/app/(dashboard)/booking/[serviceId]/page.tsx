@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -35,7 +37,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -48,11 +49,17 @@ import { Calendar } from '@/components/ui/calendar';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 
-const SERVICES_INFO: Record<string, { name: string; price: number }> = {
-  'baby-care': { name: 'Baby Sitting', price: 500 },
-  'elderly-care': { name: 'Elderly Care', price: 600 },
-  'sick-care': { name: 'Sick Patient Care', price: 800 },
-};
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import CheckoutForm from '@/components/payment/ChekoutForm';
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
+);
 
 const bookingSchema = z.object({
   date: z.date({ required_error: 'A date is required.' }),
@@ -68,6 +75,9 @@ const bookingSchema = z.object({
   division: z.string().min(1, 'Division is required'),
   district: z.string().min(1, 'District is required'),
   address: z.string().min(5, 'Full address is required'),
+  paymentPreference: z.enum(['pay-now', 'pay-later'], {
+    required_error: 'Please select a payment method',
+  }),
 });
 
 type BookingFormValues = z.infer<typeof bookingSchema>;
@@ -76,32 +86,64 @@ export default function BookingPage() {
   const params = useParams();
   const router = useRouter();
   const { data: session } = useSession();
-  const [isLoading, setIsLoading] = useState(false);
-  const serviceId = params.serviceId as string;
-  const service = SERVICES_INFO[serviceId];
 
-  if (!service)
-    return <div className="p-10 text-center">Service Not Found</div>;
+  const [isLoading, setIsLoading] = useState(false);
+  const [service, setService] = useState<any>(null);
+  const [isServiceLoading, setIsServiceLoading] = useState(true);
+
+  const [clientSecret, setClientSecret] = useState('');
+  const [isPaymentModalOpen, setPaymentModalOpen] = useState(false);
+
+  const serviceId = params.serviceId as string;
+
+  useEffect(() => {
+    const fetchService = async () => {
+      try {
+        const res = await fetch(`/api/services/${serviceId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setService(data);
+        } else {
+          toast.error('Service not found');
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error('Failed to fetch service details');
+      } finally {
+        setIsServiceLoading(false);
+      }
+    };
+
+    if (serviceId) fetchService();
+  }, [serviceId]);
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
       duration: 1,
+      paymentPreference: 'pay-later',
     },
   });
 
   const durationValue = form.watch('duration');
-  const totalCost = (Number(durationValue) || 0) * service.price;
+  const paymentPreference = form.watch('paymentPreference');
+  const totalCost = (Number(durationValue) || 0) * (service?.pricePerHour || 0);
 
-  async function onSubmit(data: BookingFormValues) {
-    setIsLoading(true);
+  async function saveBookingToDb(
+    data: BookingFormValues,
+    paymentStatus: 'Paid' | 'Unpaid',
+    transactionId?: string,
+  ) {
     try {
       const payload = {
         serviceId: params.serviceId,
-        serviceName: service.name,
+        serviceName: service.title,
         date: data.date,
         duration: data.duration,
         email: session?.user?.email,
+        paymentPreference: data.paymentPreference,
+        paymentStatus: paymentStatus,
+        transactionId: transactionId || null,
         location: {
           division: data.division,
           district: data.district,
@@ -114,15 +156,65 @@ export default function BookingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+
       if (!res.ok) throw new Error('Failed to book');
-      toast('Your booking has been confirmed.');
+
+      toast.success(
+        paymentStatus === 'Paid'
+          ? 'Payment successful! Booking confirmed.'
+          : 'Your booking has been confirmed.',
+      );
+
+      setPaymentModalOpen(false);
       router.push('/my-bookings');
     } catch (error) {
-      toast('Something went wrong. Please try again.');
+      console.error(error);
+      toast.error('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
   }
+
+  async function onSubmit(data: BookingFormValues) {
+    if (data.paymentPreference === 'pay-later') {
+      setIsLoading(true);
+      await saveBookingToDb(data, 'Unpaid');
+    } else {
+      setIsLoading(true);
+      try {
+        const res = await fetch('/api/create-payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            serviceId: params.serviceId,
+            duration: data.duration,
+          }),
+        });
+
+        const { clientSecret } = await res.json();
+
+        if (!clientSecret) throw new Error('Failed to initialize payment');
+
+        setClientSecret(clientSecret);
+        setPaymentModalOpen(true);
+      } catch (err) {
+        toast.error('Could not initiate payment. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  }
+
+  if (isServiceLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!service)
+    return <div className="p-10 text-center">Service Not Found</div>;
 
   return (
     <div className="container max-w-4xl mx-auto py-10 px-4">
@@ -130,7 +222,7 @@ export default function BookingPage() {
         <div className="md:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Book {service.name}</CardTitle>
+              <CardTitle>Book {service.title}</CardTitle>
               <CardDescription>
                 Fill in the details to schedule your care service
                 {session?.user?.email ? ` for ${session.user.email}` : ''}.
@@ -142,6 +234,7 @@ export default function BookingPage() {
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="space-y-6"
                 >
+                  {/* Date Field */}
                   <FormField
                     control={form.control}
                     name="date"
@@ -179,6 +272,7 @@ export default function BookingPage() {
                     )}
                   />
 
+                  {/* Duration Field */}
                   <FormField
                     control={form.control}
                     name="duration"
@@ -199,6 +293,7 @@ export default function BookingPage() {
                     <MapPin className="h-4 w-4" /> Location Details
                   </h3>
 
+                  {/* Location Fields */}
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -259,6 +354,54 @@ export default function BookingPage() {
                     )}
                   />
 
+                  {/* Payment Preference */}
+                  <FormField
+                    control={form.control}
+                    name="paymentPreference"
+                    render={({ field }) => (
+                      <FormItem className="space-y-3">
+                        <FormLabel>Payment Method</FormLabel>
+                        <FormControl>
+                          <div className="flex flex-col space-y-2">
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="radio"
+                                id="pay-later"
+                                value="pay-later"
+                                checked={field.value === 'pay-later'}
+                                onChange={field.onChange}
+                                className="accent-primary h-4 w-4"
+                              />
+                              <label
+                                htmlFor="pay-later"
+                                className="text-sm font-medium"
+                              >
+                                Pay Later (Cash on Delivery)
+                              </label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="radio"
+                                id="pay-now"
+                                value="pay-now"
+                                checked={field.value === 'pay-now'}
+                                onChange={field.onChange}
+                                className="accent-primary h-4 w-4"
+                              />
+                              <label
+                                htmlFor="pay-now"
+                                className="text-sm font-medium"
+                              >
+                                Pay Now (Stripe Secure)
+                              </label>
+                            </div>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <Button
                     type="submit"
                     className="w-full text-lg py-6 mt-4"
@@ -267,16 +410,17 @@ export default function BookingPage() {
                     {isLoading && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    Confirm Booking
+                    {paymentPreference === 'pay-now'
+                      ? 'Proceed to Payment'
+                      : 'Confirm Booking'}
                   </Button>
                 </form>
               </Form>
             </CardContent>
           </Card>
         </div>
-
         <div className="md:col-span-1">
-          <Card className="bg-slate-50 border-slate-200">
+          <Card className="bg-slate-50 border-slate-200 sticky top-4">
             <CardHeader className="pb-4">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Calculator className="h-5 w-5 text-primary" />
@@ -286,11 +430,13 @@ export default function BookingPage() {
             <CardContent className="space-y-4">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Service:</span>
-                <span className="font-medium">{service.name}</span>
+                <span className="font-medium">{service.title}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Rate:</span>
-                <span className="font-medium">৳{service.price} / hr</span>
+                <span className="font-medium">
+                  ৳{service.pricePerHour} / hr
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Duration:</span>
@@ -308,14 +454,35 @@ export default function BookingPage() {
 
               <div className="bg-yellow-50 p-3 rounded-md border border-yellow-100 mt-4">
                 <p className="text-xs text-yellow-800">
-                  * Note: Payment will be collected after the service is
-                  completed.
+                  {paymentPreference === 'pay-now'
+                    ? '* Note: You will be redirected to a secure popup to complete payment via Stripe.'
+                    : '* Note: Payment will be collected after the service is completed.'}
                 </p>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* STRIPE PAYMENT MODAL */}
+      <Dialog open={isPaymentModalOpen} onOpenChange={setPaymentModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Complete Payment</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            {clientSecret && (
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <CheckoutForm
+                  onSuccess={transactionId => {
+                    saveBookingToDb(form.getValues(), 'Paid', transactionId);
+                  }}
+                />
+              </Elements>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

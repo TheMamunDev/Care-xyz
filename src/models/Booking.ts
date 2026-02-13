@@ -8,6 +8,10 @@ const BookingSchema = new Schema(
     date: { type: Date, required: true },
     duration: { type: Number, required: true },
     totalCost: { type: Number, required: true },
+    email: { type: String, required: true },
+    paymentPreference: { type: String, required: true },
+    paymentStatus: { type: String, required: true },
+    transactionId: { type: String, required: true },
     status: {
       type: String,
       enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled'],
