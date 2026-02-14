@@ -62,26 +62,22 @@ const stripePromise = loadStripe(
 );
 
 const bookingSchema = z.object({
-  date: z.date({ required_error: 'A date is required.' }),
+  date: z.date(),
   duration: z
-    .string()
-    .transform(v => Number(v))
-    .pipe(
-      z
-        .number()
-        .min(1, 'Minimum 1 hour required')
-        .max(24, 'Max 24 hours per booking'),
-    ),
+    .number()
+    .min(1, 'Minimum 1 hour required')
+    .max(24, 'Max 24 hours per booking'),
   division: z.string().min(1, 'Division is required'),
   district: z.string().min(1, 'District is required'),
   address: z.string().min(5, 'Full address is required'),
+
   paymentPreference: z.enum(['pay-now', 'pay-later'], {
-    required_error: 'Please select a payment method',
+    error: 'Please select a payment method',
   }),
 });
 
 type BookingFormValues = z.infer<typeof bookingSchema>;
-
+type BookingFormOutput = z.output<typeof bookingSchema>;
 export default function BookingPage() {
   const params = useParams();
   const router = useRouter();
@@ -280,7 +276,15 @@ export default function BookingPage() {
                       <FormItem>
                         <FormLabel>Duration (Hours)</FormLabel>
                         <FormControl>
-                          <Input type="number" min="1" max="24" {...field} />
+                          <Input
+                            type="number"
+                            min="1"
+                            max="24"
+                            value={field.value ?? ''}
+                            onChange={e =>
+                              field.onChange(Number(e.target.value))
+                            }
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -72,10 +72,10 @@ const ServicesCard = ({
             className="w-full lg:w-1/2 space-y-6"
           >
             <div
-              className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${service.color} ${service.accent}`}
+              className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium `}
             >
               <Heart className="h-4 w-4 fill-current" />
-              {service.subtitle}
+              {/* {service.subtitle} */}
             </div>
 
             <h2 className="text-3xl md:text-5xl font-bold text-gray-900">
@@ -88,7 +88,7 @@ const ServicesCard = ({
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
               {service.features.map((feature, i) => (
                 <li key={i} className="flex items-center gap-3">
-                  <CheckCircle2 className={`h-5 w-5 ${service.accent}`} />
+                  <CheckCircle2 className={`h-5 w-5 `} />
                   <span className="text-gray-700 font-medium">{feature}</span>
                 </li>
               ))}
