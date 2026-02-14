@@ -17,9 +17,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
+  if (request.nextUrl.pathname === '/register' && token) {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/booking/:path*', '/my-bookings', '/login'],
+  matcher: ['/booking/:path*', '/my-bookings', '/login', '/register'],
 };

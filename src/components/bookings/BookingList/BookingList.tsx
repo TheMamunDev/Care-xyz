@@ -54,7 +54,6 @@ export default function BookingList({
   const [bookings, setBookings] = useState(initialBookings);
   const [isLoading, setIsLoading] = useState(false);
 
-  // State for View Details Modal
   const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
 
   const handleCancel = async (bookingId: string) => {
@@ -179,17 +178,6 @@ export default function BookingList({
                 <Eye className="h-4 w-4 mr-2" />
                 View Details
               </Button>
-
-              {booking.status !== 'Cancelled' && (
-                <Button
-                  size="sm"
-                  className="bg-green-600 hover:bg-green-700"
-                  onClick={() => router.push(`/payment/${booking._id}`)}
-                >
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  Pay Now
-                </Button>
-              )}
 
               {booking.status === 'Pending' && (
                 <Button
