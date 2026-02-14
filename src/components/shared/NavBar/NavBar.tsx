@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Menu, User, LogOut, Settings, LayoutDashboard } from 'lucide-react';
 import {
@@ -18,6 +19,7 @@ import { signOut, useSession } from 'next-auth/react';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
   const { data: session } = useSession();
   const user = session?.user;
 
@@ -27,6 +29,8 @@ export default function Navbar() {
     { name: 'About Us', href: '/about' },
     { name: 'Contact Us', href: '/contact' },
   ];
+
+  if (pathname?.startsWith('/admin')) return null;
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background">
