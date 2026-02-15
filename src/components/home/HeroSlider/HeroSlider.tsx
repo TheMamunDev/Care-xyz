@@ -34,7 +34,7 @@ const SLIDES: ISlide[] = [
     subtitle:
       'Verified caregivers to support your elderly family members at home.',
     cta: 'Explore Elderly Care',
-    link: '/services/elderly-care',
+    link: '/service/elderly-care',
   },
   {
     id: 3,
@@ -44,7 +44,7 @@ const SLIDES: ISlide[] = [
     subtitle:
       'Experienced babysitters you can trust, available whenever you need them.',
     cta: 'Book a Babysitter',
-    link: '/services/baby-care',
+    link: '/service/baby-care',
   },
 ];
 
