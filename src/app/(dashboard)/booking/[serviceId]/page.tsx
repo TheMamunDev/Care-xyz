@@ -77,7 +77,6 @@ const bookingSchema = z.object({
 });
 
 type BookingFormValues = z.infer<typeof bookingSchema>;
-type BookingFormOutput = z.output<typeof bookingSchema>;
 export default function BookingPage() {
   const params = useParams();
   const router = useRouter();
@@ -139,7 +138,7 @@ export default function BookingPage() {
         email: session?.user?.email,
         paymentPreference: data.paymentPreference,
         paymentStatus: paymentStatus,
-        transactionId: transactionId || null,
+        transactionId: transactionId || `CASH-${Date.now()}`,
         location: {
           division: data.division,
           district: data.district,
