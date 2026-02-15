@@ -1,13 +1,11 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+
 import './globals.css';
 import TanstackProvider from '@/components/providers/TanstackProvider';
 import AuthProvider from '@/components/providers/AuthProvider';
 import Navbar from '@/components/shared/NavBar/NavBar';
 import Footer from '@/components/shared/Footer/Footer';
 import { Toaster } from 'sonner';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Care.xyz - Trusted Care Services',
@@ -21,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
         <TanstackProvider>
           <AuthProvider>
             <Toaster />

@@ -18,81 +18,8 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-
-const SERVICES_DATA: Record<string, any> = {
-  'baby-care': {
-    id: 'baby-care',
-    title: 'Baby Sitting & Child Care',
-    tagline: 'Safe, engaging, and loving care for your little ones.',
-    description:
-      'Our professional babysitters are trained to provide a safe and nurturing environment for children of all ages. Whether you need a few hours for a date night or regular daily care while you work, our verified sitters are here to help.',
-    longDescription: `
-      Finding the right person to look after your child is a big decision. At Care.xyz, we take that responsibility seriously. 
-      
-      Our babysitters are more than just guardians; they are engaging companions who play, read, and ensure your child's routine is followed perfectly. All sitters are background-checked and trained in basic first aid.
-    `,
-    features: [
-      'Diaper changing & feeding assistance',
-      'Educational play & reading time',
-      'Light housekeeping related to the child',
-      'Bedtime routine management',
-      'Homework help for school-aged kids',
-    ],
-    pricePerHour: 500,
-    rating: 4.9,
-    reviews: 124,
-    image:
-      'https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=2070&auto=format&fit=crop',
-  },
-  'elderly-care': {
-    id: 'elderly-care',
-    title: 'Elderly Care & Companionship',
-    tagline: 'Dignified support for your aging loved ones at home.',
-    description:
-      'We provide compassionate assistance for seniors who need help with daily activities or simply want companionship. Our goal is to help them maintain independence and dignity in the comfort of their own home.',
-    longDescription: `
-      Aging is a natural part of life, but it often comes with challenges that require a helping hand. Our elderly care services are designed to support families by providing professional caregivers who treat your parents with the respect they deserve.
-      
-      From medication reminders to mobility assistance, our caregivers are patient, kind, and experienced in handling the needs of senior citizens.
-    `,
-    features: [
-      'Companionship & conversation',
-      'Mobility assistance (walking, transfers)',
-      'Medication reminders',
-      'Meal preparation & feeding',
-      'Assistance with personal hygiene',
-    ],
-    pricePerHour: 600,
-    rating: 4.8,
-    reviews: 89,
-    image:
-      'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=2070&auto=format&fit=crop',
-  },
-  'sick-care': {
-    id: 'sick-care',
-    title: 'Sick & Patient Care',
-    tagline: 'Professional nursing support for recovery.',
-    description:
-      ' specialized care for family members recovering from illness, surgery, or managing chronic conditions. Our caregivers are trained to monitor vitals and provide essential support.',
-    longDescription: `
-      When a family member is sick, they need constant attention and professional care. Our sick care service provides trained attendants or nurses who can monitor patient health, manage comfort, and assist with recovery protocols.
-      
-      We ensure that your loved one is never alone during their recovery process.
-    `,
-    features: [
-      'Vitals monitoring (BP, Temp, Pulse)',
-      'Post-surgery care & support',
-      'Bed sore prevention & management',
-      'Assistance with exercises/physiotherapy',
-      'Detailed health logging for doctors',
-    ],
-    pricePerHour: 800,
-    rating: 5.0,
-    reviews: 42,
-    image:
-      'https://images.unsplash.com/photo-1584515933487-9bdbb7043172?q=80&w=2070&auto=format&fit=crop',
-  },
-};
+import connectDB from '@/lib/db';
+import Services from '@/models/Service';
 
 export default async function ServiceDetailPage({
   params,
@@ -101,11 +28,13 @@ export default async function ServiceDetailPage({
 }) {
   const { serviceId } = await params;
 
-  if (!Object.keys(SERVICES_DATA).includes(serviceId)) {
+  await connectDB();
+
+  const service = await Services.findOne({ id: serviceId });
+
+  if (!service) {
     notFound();
   }
-  console.log(serviceId);
-  const service = SERVICES_DATA[serviceId];
 
   return (
     <div className="min-h-screen bg-secondary/20 pb-20">

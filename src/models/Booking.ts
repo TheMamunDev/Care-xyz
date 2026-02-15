@@ -14,7 +14,7 @@ const BookingSchema = new Schema(
     transactionId: { type: String, required: true },
     status: {
       type: String,
-      enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled'],
+      enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled', 'Ongoing'],
       default: 'Pending',
     },
     location: {
