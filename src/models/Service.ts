@@ -11,6 +11,7 @@ export interface IService extends Document {
   rating: number;
   reviews: number;
   image: string;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -57,6 +58,10 @@ const ServiceSchema = new Schema<IService>(
     image: {
       type: String,
       required: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   {

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Menu, User, LogOut, Settings, LayoutDashboard } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,7 +50,12 @@ export default function Navbar() {
             <Link
               key={link.name}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+              className={cn(
+                'text-sm font-medium transition-colors hover:text-primary',
+                pathname === link.href
+                  ? 'text-primary font-bold underline'
+                  : 'text-muted-foreground',
+              )}
             >
               {link.name}
             </Link>
@@ -129,27 +135,21 @@ export default function Navbar() {
             </SheetTrigger>
             <SheetContent side="right">
               <div className="flex flex-col gap-6 mt-6">
-                <Link
-                  href="/"
-                  onClick={() => setIsOpen(false)}
-                  className="text-lg font-semibold"
-                >
-                  Home
-                </Link>
-                <Link
-                  href="/services"
-                  onClick={() => setIsOpen(false)}
-                  className="text-lg font-semibold"
-                >
-                  Services
-                </Link>
-                <Link
-                  href="/about"
-                  onClick={() => setIsOpen(false)}
-                  className="text-lg font-semibold"
-                >
-                  About Us
-                </Link>
+                {navLinks.map(link => (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setIsOpen(false)}
+                    className={cn(
+                      'text-lg font-semibold hover:text-primary transition-colors',
+                      pathname === link.href
+                        ? 'text-primary'
+                        : 'text-foreground',
+                    )}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
                 <div className="h-px bg-border my-2" />
                 {user ? (
                   <>

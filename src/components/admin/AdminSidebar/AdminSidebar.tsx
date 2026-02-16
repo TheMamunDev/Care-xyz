@@ -29,6 +29,12 @@ const adminRoutes = [
     color: 'text-violet-500',
   },
   {
+    label: 'Services',
+    icon: CalendarDays,
+    href: '/admin/services',
+    color: 'text-violet-500',
+  },
+  {
     label: 'All Bookings',
     icon: CalendarDays,
     href: '/admin/bookings',

@@ -11,6 +11,8 @@ const UserSchema = new Schema(
       },
     },
     contact: { type: String },
+    address: { type: String },
+    bio: { type: String },
     nid: { type: String },
     role: { type: String, default: 'user' },
     image: { type: String },

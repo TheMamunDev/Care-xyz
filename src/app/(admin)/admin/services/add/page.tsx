@@ -31,13 +31,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const formSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
-  price: z
-    .number()
-    .transform(v => Number(v))
-    .pipe(z.number().min(1, 'Price must be positive')),
+  price: z.coerce.number().min(1, 'Price must be positive'),
   description: z.string().min(20, 'Description must be detailed'),
   longDescription: z.string().min(20, 'Description must be detailed'),
-  tagLine: z.string().min(3, 'Title must be at least 3 characters'),
+  tagLine: z.string().min(5, 'Tag line must be at least 5 characters'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -52,12 +49,14 @@ export default function AddServicePage() {
   const [features, setFeatures] = useState<string[]>([]);
   const [currentFeature, setCurrentFeature] = useState('');
 
-  const form = useForm<FormValues>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
       description: '',
       price: 0,
+      longDescription: '',
+      tagLine: '',
     },
   });
 
@@ -132,7 +131,6 @@ export default function AddServicePage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Title */}
                 <FormField
                   control={form.control}
                   name="title"
@@ -153,14 +151,16 @@ export default function AddServicePage() {
                     <FormItem>
                       <FormLabel>Tag Line</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Newborn Care" {...field} />
+                        <Input
+                          placeholder="e.g. Expert care for your little ones"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Price */}
                 <FormField
                   control={form.control}
                   name="price"
@@ -176,7 +176,6 @@ export default function AddServicePage() {
                 />
               </div>
 
-              {/* Description */}
               <FormField
                 control={form.control}
                 name="description"
@@ -212,7 +211,6 @@ export default function AddServicePage() {
                 )}
               />
 
-              {/* --- Custom Image Upload UI --- */}
               <div className="space-y-3">
                 <FormLabel>Cover Image</FormLabel>
                 <div className="flex items-center gap-6">
@@ -258,7 +256,6 @@ export default function AddServicePage() {
                 </div>
               </div>
 
-              {/* --- Dynamic Features List --- */}
               <div className="space-y-3">
                 <FormLabel>Service Features</FormLabel>
                 <div className="flex gap-2">
@@ -306,7 +303,6 @@ export default function AddServicePage() {
                 </div>
               </div>
 
-              {/* Submit Button */}
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Create Service
