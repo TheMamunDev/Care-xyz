@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import connectDB from '@/lib/db';
 import Services from '@/models/Service';
+import ServiceReviews from '@/components/services/ServicesReviews';
 
 export default async function ServiceDetailPage({
   params,
@@ -30,11 +31,18 @@ export default async function ServiceDetailPage({
 
   await connectDB();
 
-  const service = await Services.findOne({ id: serviceId });
+  const serviceRaw = await Services.findOne({ id: serviceId }).lean();
 
-  if (!service) {
+  if (!serviceRaw) {
     notFound();
   }
+
+  const service = {
+    ...serviceRaw,
+    _id: serviceRaw._id.toString(),
+    createdAt: serviceRaw.createdAt?.toISOString(),
+    updatedAt: serviceRaw.updatedAt?.toISOString(),
+  };
 
   return (
     <div className="min-h-screen bg-secondary/20 pb-20">
@@ -180,6 +188,10 @@ export default async function ServiceDetailPage({
                 </Link>
               </div>
             </div>
+            <ServiceReviews
+              serviceId={serviceId}
+              service={service}
+            ></ServiceReviews>
           </div>
         </div>
       </div>

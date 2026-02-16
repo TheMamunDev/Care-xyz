@@ -263,6 +263,7 @@ export default function ProfilePageClient() {
                                 className="pl-9"
                                 placeholder="9867"
                                 {...field}
+                                value={field.value as number}
                               />
                             </div>
                           </FormControl>

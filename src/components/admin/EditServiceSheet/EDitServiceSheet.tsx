@@ -171,7 +171,12 @@ export default function EditServiceSheet({
                   <FormItem className="flex-1">
                     <FormLabel>Price (৳)</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} />
+                      <Input
+                        type="number"
+                        {...field}
+                        value={field.value as number}
+                        onChange={e => field.onChange(Number(e.target.value))}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

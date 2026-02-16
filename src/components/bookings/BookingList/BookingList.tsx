@@ -10,6 +10,7 @@ import {
   CreditCard,
   XCircle,
   Eye,
+  Star,
 } from 'lucide-react';
 import {
   Card,
@@ -29,6 +30,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import ReviewForm from '@/components/services/ReviewForm';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -55,6 +57,7 @@ export default function BookingList({
   const [isLoading, setIsLoading] = useState(false);
 
   const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
+  const [reviewBooking, setReviewBooking] = useState<any | null>(null);
 
   const handleCancel = async (bookingId: string) => {
     if (!confirm('Are you sure you want to cancel this booking?')) return;
@@ -106,7 +109,10 @@ export default function BookingList({
           >
             <CardHeader className="bg-slate-50/50 pb-4">
               <div className="flex justify-between items-start">
-                <div>
+                <div
+                  className="cursor-pointer"
+                  onClick={() => router.push(`/service/${booking.serviceId}`)}
+                >
                   <CardTitle className="text-lg font-bold text-gray-900">
                     {booking.serviceName}
                   </CardTitle>
@@ -190,12 +196,22 @@ export default function BookingList({
                   Cancel Booking
                 </Button>
               )}
+
+              {booking.status === 'Completed' && (
+                <Button
+                  size="sm"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                  onClick={() => setReviewBooking(booking)}
+                >
+                  <Star className="h-4 w-4 mr-2" />
+                  Write Review
+                </Button>
+              )}
             </CardFooter>
           </Card>
         ))}
       </div>
 
-      {/* View Details Dialog */}
       <Dialog
         open={!!selectedBooking}
         onOpenChange={() => setSelectedBooking(null)}
@@ -238,6 +254,27 @@ export default function BookingList({
                 </div>
               </div>
             </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!reviewBooking}
+        onOpenChange={open => !open && setReviewBooking(null)}
+      >
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Rate Service</DialogTitle>
+            <DialogDescription>
+              How was your experience with {reviewBooking?.serviceName}?
+            </DialogDescription>
+          </DialogHeader>
+          {reviewBooking && (
+            <ReviewForm
+              serviceId={reviewBooking.serviceId}
+              bookingId={reviewBooking._id}
+              onSuccess={() => setReviewBooking(null)}
+            />
           )}
         </DialogContent>
       </Dialog>

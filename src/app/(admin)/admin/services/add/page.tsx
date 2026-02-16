@@ -168,7 +168,13 @@ export default function AddServicePage() {
                     <FormItem>
                       <FormLabel>Price Per Hour (৳)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="500" {...field} />
+                        <Input
+                          type="number"
+                          placeholder="500"
+                          {...field}
+                          value={field.value as number}
+                          onChange={e => field.onChange(Number(e.target.value))}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
