@@ -59,7 +59,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Services */}
           <div>
             <h4 className="font-semibold mb-4 text-slate-900">Services</h4>
             <ul className="space-y-2 text-sm text-slate-600">
@@ -98,7 +97,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
             <h4 className="font-semibold mb-4 text-slate-900">Contact Us</h4>
             <ul className="space-y-3 text-sm text-slate-600">
@@ -118,7 +116,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-slate-500">
             © {new Date().getFullYear()} Care.xyz. All rights reserved.

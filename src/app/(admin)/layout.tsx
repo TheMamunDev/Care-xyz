@@ -24,8 +24,8 @@ export default async function AdminLayout({
       <aside className="hidden md:flex w-72 flex-col bg-gray-900">
         <AdminSidebar />
       </aside>
-      <div className="flex-1">
-        {/* <AdminNavbar /> */}
+      <div className="flex-1 flex flex-col">
+        <AdminNavbar />
         <main className="flex-1 p-8">{children}</main>
       </div>
     </div>

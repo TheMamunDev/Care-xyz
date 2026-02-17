@@ -11,9 +11,11 @@ import {
   Settings,
   LogOut,
   ShieldAlert,
+  Home,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { signOut } from 'next-auth/react';
+import { Router } from 'next/router';
 
 const adminRoutes = [
   {
@@ -90,6 +92,13 @@ export default function AdminSidebar() {
         </div>
       </div>
       <div className="px-3 py-2">
+        <Link
+          href="/"
+          className="w-full justify-start items-center flex p-2 bg-red-500 rounded-xl text-white font-medium mb-2"
+        >
+          <Home className="h-4 w-4 mr-2" />
+          Home
+        </Link>
         <Button
           onClick={() => signOut({ callbackUrl: '/' })}
           variant="destructive"

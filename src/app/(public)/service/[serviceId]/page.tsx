@@ -45,7 +45,7 @@ export default async function ServiceDetailPage({
   };
 
   return (
-    <div className="min-h-screen bg-secondary/20 pb-20">
+    <div className="min-h-screen container mx-auto bg-secondary/20 pb-20">
       <div className="relative h-[400px] w-full">
         <Image
           src={service.image}

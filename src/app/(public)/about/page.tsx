@@ -59,7 +59,7 @@ const team = [
 
 export default function AboutPage() {
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white min-h-screen container mx-auto">
       <section className="relative py-24 bg-secondary/30 overflow-hidden">
         <div className="container px-4 md:px-8 mx-auto text-center relative z-10">
           <Badge className="bg-primary/10 text-primary hover:bg-primary/20 mb-4 px-4 py-1">
@@ -89,8 +89,8 @@ export default function AboutPage() {
       <section className="py-20 container px-4 md:px-8 mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div className="relative">
-            <div className="absolute -inset-4 bg-orange-100 rounded-2xl transform rotate-3" />
-            <div className="relative h-[500px] w-full rounded-2xl overflow-hidden shadow-xl">
+            <div className="absolute -inset-2 md:-inset-4 bg-orange-100 rounded-2xl transform rotate-2 md:rotate-3" />
+            <div className="relative h-[300px] md:h-[500px] w-full rounded-2xl overflow-hidden shadow-xl">
               <Image
                 src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=2000&auto=format&fit=crop"
                 alt="Friends/Family laughing"

@@ -91,18 +91,38 @@ export default function Navbar() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/my-bookings" className="cursor-pointer">
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    My Bookings
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/profile" className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
-                  </Link>
-                </DropdownMenuItem>
+                {user.role === 'admin' ? (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin" className="cursor-pointer">
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile" className="cursor-pointer">
+                        <User className="mr-2 h-4 w-4" />
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link href="/my-bookings" className="cursor-pointer">
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        My Bookings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile" className="cursor-pointer">
+                        <User className="mr-2 h-4 w-4" />
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
+
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-destructive focus:text-destructive cursor-pointer"
@@ -134,7 +154,7 @@ export default function Navbar() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
-              <div className="flex flex-col gap-6 mt-6">
+              <div className="flex flex-col gap-6 mt-6 pl-3">
                 {navLinks.map(link => (
                   <Link
                     key={link.name}
@@ -153,13 +173,33 @@ export default function Navbar() {
                 <div className="h-px bg-border my-2" />
                 {user ? (
                   <>
-                    <Link
-                      href="/my-bookings"
-                      onClick={() => setIsOpen(false)}
-                      className="text-lg font-semibold"
-                    >
-                      My Bookings
-                    </Link>
+                    {user.role === 'admin' ? (
+                      <Link
+                        href="/admin"
+                        onClick={() => setIsOpen(false)}
+                        className="text-lg font-semibold"
+                      >
+                        Dashboard
+                      </Link>
+                    ) : (
+                      <>
+                        <Link
+                          href="/my-bookings"
+                          onClick={() => setIsOpen(false)}
+                          className="text-lg font-semibold"
+                        >
+                          My Bookings
+                        </Link>
+                        <Link
+                          href="/profile"
+                          onClick={() => setIsOpen(false)}
+                          className="text-lg font-semibold"
+                        >
+                          My Profile
+                        </Link>
+                      </>
+                    )}
+
                     <button
                       className="text-left text-lg font-semibold text-destructive"
                       onClick={() => signOut()}

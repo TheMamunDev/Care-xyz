@@ -52,7 +52,7 @@ export default function AllServicesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-slate-900">
             Services
@@ -68,9 +68,9 @@ export default function AllServicesPage() {
         </Link>
       </div>
 
-      <div className="rounded-md border bg-white">
-        <Table>
-          <TableHeader>
+      <div className="rounded-md border bg-white w-full overflow-x-auto">
+        <Table className="min-w-0 w-full">
+          <TableHeader className="bg-gray-50/50 hidden lg:table-header-group">
             <TableRow>
               <TableHead>Image</TableHead>
               <TableHead>Title</TableHead>
@@ -80,23 +80,32 @@ export default function AllServicesPage() {
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className="grid grid-cols-1 gap-4 lg:table-row-group">
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-10">
+              <TableRow className="flex flex-col border rounded-lg p-4 lg:p-0 lg:table-row lg:border-0">
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-10 block lg:table-cell"
+                >
                   Loading...
                 </TableCell>
               </TableRow>
             ) : services?.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-10">
+              <TableRow className="flex flex-col border rounded-lg p-4 lg:p-0 lg:table-row lg:border-0">
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-10 block lg:table-cell"
+                >
                   No services found.
                 </TableCell>
               </TableRow>
             ) : (
               services?.map((service: any) => (
-                <TableRow key={service._id}>
-                  <TableCell>
+                <TableRow
+                  key={service._id}
+                  className="flex flex-col h-full border rounded-lg shadow-sm lg:shadow-none lg:table-row lg:border-0 p-4 lg:p-0 space-y-4 lg:space-y-0 hover:bg-gray-50/50"
+                >
+                  <TableCell className="block lg:table-cell">
                     <Avatar className="h-10 w-10 rounded-lg">
                       <AvatarImage
                         src={service.image}
@@ -105,9 +114,22 @@ export default function AllServicesPage() {
                       <AvatarFallback>SR</AvatarFallback>
                     </Avatar>
                   </TableCell>
-                  <TableCell className="font-medium">{service.title}</TableCell>
-                  <TableCell>৳{service.price}</TableCell>
-                  <TableCell>
+                  <TableCell className="font-medium block lg:table-cell break-words">
+                    <span className="text-xs text-gray-500 lg:hidden block mb-1">
+                      Title
+                    </span>
+                    {service.title}
+                  </TableCell>
+                  <TableCell className="block lg:table-cell">
+                    <span className="text-xs text-gray-500 lg:hidden block mb-1">
+                      Price / Hr
+                    </span>
+                    ৳{service.pricePerHour}
+                  </TableCell>
+                  <TableCell className="block lg:table-cell">
+                    <span className="text-xs text-gray-500 lg:hidden block mb-1">
+                      Status
+                    </span>
                     {service.isActive ? (
                       <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
                         Active
@@ -116,34 +138,39 @@ export default function AllServicesPage() {
                       <Badge variant="secondary">Inactive</Badge>
                     )}
                   </TableCell>
-                  <TableCell className="max-w-[200px] truncate text-xs text-gray-500">
+                  <TableCell className="max-w-[200px] truncate text-xs text-gray-500 block lg:table-cell">
+                    <span className="text-xs text-gray-500 lg:hidden block mb-1">
+                      Features
+                    </span>
                     {service.features?.join(', ')}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                          onClick={() => setEditingService(service)}
-                        >
-                          <Pencil className="mr-2 h-4 w-4" /> Edit Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="text-red-600 focus:text-red-600"
-                          onClick={() => {
-                            if (confirm('Delete this service?'))
-                              deleteMutation.mutate(service._id);
-                          }}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <TableCell className="text-right block lg:table-cell">
+                    <div className="flex justify-end">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem
+                            onClick={() => setEditingService(service)}
+                          >
+                            <Pencil className="mr-2 h-4 w-4" /> Edit Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-600 focus:text-red-600"
+                            onClick={() => {
+                              if (confirm('Delete this service?'))
+                                deleteMutation.mutate(service._id);
+                            }}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
