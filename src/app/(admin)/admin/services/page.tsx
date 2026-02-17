@@ -1,4 +1,5 @@
 'use client';
+import { confirmAction } from '@/lib/sweetalert';
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -161,9 +162,13 @@ export default function AllServicesPage() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-red-600 focus:text-red-600"
-                            onClick={() => {
-                              if (confirm('Delete this service?'))
-                                deleteMutation.mutate(service._id);
+                            onClick={async () => {
+                              const isConfirmed = await confirmAction({
+                                title: 'Delete Service?',
+                                text: 'Are you sure you want to delete this service?',
+                                confirmButtonText: 'Yes, delete it',
+                              });
+                              if (isConfirmed) deleteMutation.mutate(service._id);
                             }}
                           >
                             <Trash2 className="mr-2 h-4 w-4" /> Delete

@@ -1,4 +1,5 @@
 'use client';
+import { confirmAction } from '@/lib/sweetalert';
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -191,12 +192,14 @@ export default function UsersTable() {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-red-600 focus:text-red-600"
-                        onClick={() => {
-                          if (
-                            confirm(
-                              'Are you sure you want to delete this user?',
-                            )
-                          ) {
+                        onClick={async () => {
+                          const isConfirmed = await confirmAction({
+                            title: 'Delete User?',
+                            text: 'Are you sure you want to delete this user? This action cannot be undone.',
+                            confirmButtonText: 'Yes, delete user',
+                          });
+
+                          if (isConfirmed) {
                             actionMutation.mutate({
                               userId: user._id,
                               action: 'delete',

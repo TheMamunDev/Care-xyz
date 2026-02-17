@@ -1,4 +1,5 @@
 'use client';
+import { confirmAction } from '@/lib/sweetalert';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -60,7 +61,12 @@ export default function BookingList({
   const [reviewBooking, setReviewBooking] = useState<any | null>(null);
 
   const handleCancel = async (bookingId: string) => {
-    if (!confirm('Are you sure you want to cancel this booking?')) return;
+    const isConfirmed = await confirmAction({
+      title: 'Cancel Booking?',
+      text: 'Are you sure you want to cancel this booking?',
+      confirmButtonText: 'Yes, cancel it',
+    });
+    if (!isConfirmed) return;
     setIsLoading(true);
     try {
       const res = await fetch(`/api/bookings/${bookingId}/cancel`, {
